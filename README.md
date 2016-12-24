@@ -1,0 +1,2 @@
+# GoZombie
+Go Malware Agent
