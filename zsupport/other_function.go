@@ -3,10 +3,7 @@ package zsupport
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/aglyzov/charmap"
 	"math/rand"
-	"os/exec"
-	"strings"
 	"time"
 )
 
