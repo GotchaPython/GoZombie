@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"os/exec"
 	"strings"
-	"syscall"
 	"time"
 )
 
@@ -23,39 +22,6 @@ func IsDebugModeEnable() bool {
 func SetDebugMode(mode bool) {
 	debugMode = mode
 }
-
-func CmdExec(cmd string) ([]byte, error) {
-
-	cmd_li := exec.Command("cmd", "/C")
-	cmd_li.SysProcAttr = &syscall.SysProcAttr{HideWindow: true} //Это необходимо для того что бы CMD запускалось в скрытом режиме
-	output, err := cmd_li.Output()
-
-	if output != nil && len(output) > 0 {
-		return charmap.CP866_to_UTF8(output), nil
-	} else {
-		return output, err
-	}
-}
-
-func CmdExecOrig(cmd string) ([]byte, error) {
-	cmd_split := strings.Split(cmd, "@")
-	params := make([]string, len(cmd_split)+2)
-	params[0] = "/Q"
-	params[1] = "/C"
-	copy(params[2:], cmd_split[:])
-
-	cmd_li := exec.Command("cmd", params...)
-	cmd_li.SysProcAttr = &syscall.SysProcAttr{HideWindow: true} //Это необходимо для того что бы CMD запускалось в скрытом режиме
-	output, err := cmd_li.Output()
-
-	if output != nil && len(output) > 0 {
-		return charmap.CP866_to_UTF8(output), nil
-	} else {
-		return output, err
-	}
-}
-
-
 
 
 func OutMessage(message string) {
