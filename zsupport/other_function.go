@@ -27,7 +27,7 @@ func SetDebugMode(mode bool) {
 func CmdExec(cmd string) ([]byte, error) {
 
 	cmd_li := exec.Command("cmd", "/C")
-	cmd_li.SysProcAttr = &syscall.SysProcAttr{HideWindow: true} //Это необходимо для того что бы CMD запускалось в скрытом режиме
+	//cmd_li.SysProcAttr = &syscall.SysProcAttr{HideWindow: true} //Это необходимо для того что бы CMD запускалось в скрытом режиме
 	output, err := cmd_li.Output()
 
 	if output != nil && len(output) > 0 {
@@ -45,7 +45,7 @@ func CmdExecOrig(cmd string) ([]byte, error) {
 	copy(params[2:], cmd_split[:])
 
 	cmd_li := exec.Command("cmd", params...)
-	cmd_li.SysProcAttr = &syscall.SysProcAttr{HideWindow: true} //Это необходимо для того что бы CMD запускалось в скрытом режиме
+	//cmd_li.SysProcAttr = &syscall.SysProcAttr{HideWindow: true} //Это необходимо для того что бы CMD запускалось в скрытом режиме
 	output, err := cmd_li.Output()
 
 	if output != nil && len(output) > 0 {
