@@ -2,25 +2,20 @@
 
 package zsupport
 
+func ExecWindows(output string) string {
 
-func ExecWindows(output string)string{
-
-
-
-return output
+	return output
 }
 
-func HiddenWindow(){
+func HiddenWindow() {
 
 }
 
-func WriteRegistryKey(test, regPath, nameProgram, pathToExecFile string){
+func WriteRegistryKey(test, regPath, nameProgram, pathToExecFile string) {
 
-return
+	return
 }
 
 func RegisterAutoRun(zombieName, fullPathBotSourceExecFile string) {
-return       
+	return
 }
-
-

