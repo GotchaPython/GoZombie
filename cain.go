@@ -39,6 +39,7 @@ func main() {
 	if err != nil {
 		zsupport.OutMessage("Connection Failed to " + fmt.Sprint(uri))
 		log.Printf("NewClient error:%v\n", err)
+		main()
 		return
 	}
 
@@ -93,19 +94,21 @@ func main() {
 
 	client.On("disconnection", func() {
 		log.Printf("on disconnect\n")
+		main()
 	})
 
-	//Read data from console to send custom messages
+	
 	//reader := bufio.NewReader(os.Stdin)
 
 	for {
-		//data, _, _ := reader.ReadLine()
+		/*data, _, _ := reader.ReadLine()
 
-		//command := string(data)
+		command := string(data)
 
-		//encrypted := xor.EncryptDecrypt(command, key)
+		encrypted := xor.EncryptDecrypt(command, key)
 
-		//client.Emit("jnkcyp", encrypted)
-		//log.Printf("send message:%v\n", encrypted)
+		client.Emit("jnkcyp", encrypted)
+		log.Printf("send message:%v\n", encrypted)
+		*/
 	}
 }
