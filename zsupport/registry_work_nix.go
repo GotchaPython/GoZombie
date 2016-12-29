@@ -3,8 +3,11 @@
 package zsupport
 
 
-func ExecWindows(){
+func ExecWindows(output string)string{
 
+
+
+return output
 }
 
 func HiddenWindow(){

